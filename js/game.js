@@ -360,19 +360,17 @@ function makeQuizOptions(glyph) {
     : KANA_DATA.kana.filter((k) => k.script === glyph.script && k.char !== glyph.char);
   const sameRow = pool.filter((k) => k.row === glyph.row);
   const rest = pool.filter((k) => k.row !== glyph.row);
-  const correct = optionLabel(glyph);
-  const seen = new Set([correct]);
+  const seen = new Set([glyph.char]);
   const distractors = [];
   for (const item of shuffle([...sameRow, ...rest])) {
-    const label = optionLabel(item);
-    if (seen.has(label))
+    if (seen.has(item.char))
       continue;
-    seen.add(label);
-    distractors.push({ label, correct: false });
+    seen.add(item.char);
+    distractors.push({ char: item.char, label: optionLabel(item), correct: false });
     if (distractors.length === 3)
       break;
   }
-  return shuffle([{ label: correct, correct: true }, ...distractors]);
+  return shuffle([{ char: glyph.char, label: optionLabel(glyph), correct: true }, ...distractors]);
 }
 
 function showTraceUi() {
@@ -391,7 +389,7 @@ function renderQuiz() {
   for (const choice of state.quizChoices) {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.textContent = choice.label;
+    btn.innerHTML = `<span class="quiz-char">${choice.char}</span><span class="quiz-read">${choice.label}</span>`;
     btn.addEventListener("click", () => onQuizPick(choice.correct));
     quizOptions.appendChild(btn);
   }
