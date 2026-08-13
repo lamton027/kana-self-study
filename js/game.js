@@ -8,6 +8,8 @@ const ATTACK_MS = 340;
 const KV = KANA_DATA.viewBox;
 
 const pad = document.getElementById("pad");
+const quizEl = document.getElementById("quiz");
+const quizOptions = document.getElementById("quiz-options");
 const battle = document.getElementById("battle");
 const ctx = pad.getContext("2d");
 const bx = battle.getContext("2d");
@@ -37,6 +39,8 @@ const state = {
   enemyHp: 2,
   enemyMax: 2,
   anim: null,
+  phase: "trace",
+  quizChoices: [],
   onWin: null,
   onLose: null,
 };
@@ -305,13 +309,17 @@ function renderHud() {
   const kana = currentKana();
   if (!kana)
     return;
-  zoneEl.textContent = state.label;
+  zoneEl.textContent = state.phase === "quiz" ? `${state.label} · quiz` : state.label;
   glyphEl.textContent = kana.char;
-  romajiEl.textContent = kana.meaning ? `${kana.romaji} · ${kana.meaning}` : kana.romaji;
-  strokeStat.textContent = `${Math.min(state.stroke + 1, kana.strokes.length)} / ${kana.strokes.length}`;
+  romajiEl.textContent = state.phase === "quiz" ? "?" : (kana.meaning ? `${kana.romaji} · ${kana.meaning}` : kana.romaji);
+  strokeStat.textContent = state.phase === "quiz"
+    ? `Quiz ${state.enemyMax - state.enemyHp + 1} / ${state.enemyMax}`
+    : `${Math.min(state.stroke + 1, kana.strokes.length)} / ${kana.strokes.length}`;
   playerHpEl.textContent = `${Math.max(state.playerHp, 0)} / ${PLAYER_MAX}`;
   enemyHpEl.textContent = `${Math.max(state.enemyHp, 0)} / ${state.enemyMax}`;
-  hintEl.textContent = "Tô đúng thì bạn tấn công. Sai 1 nét là vẽ lại cả chữ từ đầu.";
+  hintEl.textContent = state.phase === "quiz"
+    ? "Nhìn chữ, chọn 1 trong 4 cách đọc. Đúng thì đánh, sai thì bị đánh."
+    : "Tô đúng thì bạn tấn công. Sai 1 nét là vẽ lại cả chữ từ đầu.";
 }
 
 function render() {
@@ -333,6 +341,105 @@ function armEnemy(kana) {
   state.playerHp = PLAYER_MAX;
 }
 
+function optionLabel(glyph) {
+  return glyph.meaning ? `${glyph.romaji} · ${glyph.meaning}` : glyph.romaji;
+}
+
+function shuffle(list) {
+  const items = [...list];
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  return items;
+}
+
+function makeQuizOptions(glyph) {
+  const pool = glyph.script === "kanji"
+    ? KANA_DATA.kanji.filter((k) => k.char !== glyph.char)
+    : KANA_DATA.kana.filter((k) => k.script === glyph.script && k.char !== glyph.char);
+  const sameRow = pool.filter((k) => k.row === glyph.row);
+  const rest = pool.filter((k) => k.row !== glyph.row);
+  const correct = optionLabel(glyph);
+  const seen = new Set([correct]);
+  const distractors = [];
+  for (const item of shuffle([...sameRow, ...rest])) {
+    const label = optionLabel(item);
+    if (seen.has(label))
+      continue;
+    seen.add(label);
+    distractors.push({ label, correct: false });
+    if (distractors.length === 3)
+      break;
+  }
+  return shuffle([{ label: correct, correct: true }, ...distractors]);
+}
+
+function showTraceUi() {
+  pad.hidden = false;
+  quizEl.hidden = true;
+}
+
+function showQuizUi() {
+  pad.hidden = true;
+  quizEl.hidden = false;
+}
+
+function renderQuiz() {
+  state.quizChoices = makeQuizOptions(state.glyph);
+  quizOptions.innerHTML = "";
+  for (const choice of state.quizChoices) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = choice.label;
+    btn.addEventListener("click", () => onQuizPick(choice.correct));
+    quizOptions.appendChild(btn);
+  }
+}
+
+function startQuiz() {
+  state.phase = "quiz";
+  state.enemyMax = LESSON_WRITES;
+  state.enemyHp = LESSON_WRITES;
+  showQuizUi();
+  renderQuiz();
+  setStatus("Quiz: nhìn chữ, chọn cách đọc. Đúng thì đánh, sai thì bị đánh.", "good");
+  render();
+}
+
+function onQuizPick(correct) {
+  if (state.phase !== "quiz" || state.busy)
+    return;
+  quizOptions.querySelectorAll("button").forEach((btn) => {
+    btn.disabled = true;
+  });
+  if (!correct) {
+    playAttack("enemy", () => {
+      state.playerHp -= 1;
+      if (state.playerHp <= 0) {
+        setStatus("Hết máu — về điểm spawn.", "bad");
+        state.onLose?.();
+        return;
+      }
+      setStatus("Sai — enemy tấn công! Chọn lại.", "bad");
+      renderQuiz();
+      render();
+    });
+    return;
+  }
+  playAttack("player", () => {
+    state.enemyHp -= 1;
+    if (state.enemyHp <= 0) {
+      setStatus("Thắng quiz! Quay lại map.", "good");
+      state.onWin?.();
+      return;
+    }
+    setStatus("Đúng — bạn tấn công! Còn 1 câu.", "good");
+    renderQuiz();
+    render();
+  });
+}
+
 function beginEncounter(spec) {
   showBattle();
   state.glyph = spec.glyph;
@@ -349,6 +456,8 @@ function beginEncounter(spec) {
   resetWriting();
   loadTemplates(spec.glyph);
   armEnemy(spec.glyph);
+  state.phase = "trace";
+  showTraceUi();
   setStatus(`Gặp ${spec.label}! Tô nét để đánh.`);
   speak(spec.glyph.char);
   render();
@@ -407,8 +516,7 @@ function finishStroke() {
   playAttack("player", () => {
     state.enemyHp -= 1;
     if (state.enemyHp <= 0) {
-      setStatus("Thắng! Quay lại map.", "good");
-      state.onWin?.();
+      startQuiz();
       return;
     }
     if (writingDone)
@@ -419,7 +527,7 @@ function finishStroke() {
 }
 
 pad.addEventListener("pointerdown", (event) => {
-  if (!currentKana() || screenBattle.hidden || state.busy)
+  if (!currentKana() || screenBattle.hidden || state.busy || state.phase !== "trace")
     return;
   event.preventDefault();
   pad.setPointerCapture(event.pointerId);

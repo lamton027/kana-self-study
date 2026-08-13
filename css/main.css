@@ -122,6 +122,40 @@ button:hover { border-color: var(--accent); color: var(--accent); }
   display: block;
 }
 
+#pad[hidden] { display: none !important; }
+
+#quiz[hidden] { display: none !important; }
+
+#quiz {
+  background: #f4efe4;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 280px;
+}
+
+.quiz-prompt {
+  margin: 0 0 12px;
+  color: #2a3348;
+  text-align: center;
+  font-weight: 600;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.quiz-options button {
+  background: #fff;
+  color: #1a1d24;
+  border: 2px solid #c9c1b2;
+  min-height: 56px;
+  font-size: 1.05rem;
+}
+
+.quiz-options button:hover { border-color: #2c6bed; color: #2c6bed; }
+
 .hint { margin: 8px 0 0; color: var(--muted); font-size: 0.9rem; }
 
 aside {
