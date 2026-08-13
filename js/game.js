@@ -395,11 +395,8 @@ function completeRow() {
 }
 
 function retryKana() {
-  const kana = currentKana();
-  resetWriting();
-  armEnemy(kana);
-  setStatus("Bại trận. Thử lại chữ này.", "bad");
-  render();
+  startRow(state.rowId);
+  setStatus(`Hết máu — về ${currentKana().char}, chữ đầu hàng.`, "bad");
 }
 
 function afterEnemyDefeated() {
