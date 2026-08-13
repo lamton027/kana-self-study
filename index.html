@@ -3,28 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Kana Trace</title>
+  <title>Ink Route</title>
   <link rel="stylesheet" href="./css/main.css">
 </head>
 <body>
   <header>
-    <h1>Kana Trace</h1>
-    <p class="sub">Tô đúng để đánh — tô sai thì bị đánh</p>
+    <h1>Ink Route</h1>
+    <p class="sub">Đi vào cỏ để gặp quái. Càng sang phải càng mạnh: Hiragana → Katakana → Kanji</p>
   </header>
 
-  <nav class="scripts">
-    <button type="button" id="btn-hira" class="active" data-script="hiragana">Hiragana</button>
-    <button type="button" id="btn-kata" data-script="katakana">Katakana</button>
-  </nav>
-  <div id="rows" class="rows"></div>
+  <section id="screen-world">
+    <canvas id="world" width="640" height="288"></canvas>
+    <p class="legend">
+      <span class="dot hira"></span> Hiragana
+      <span class="dot kata"></span> Katakana
+      <span class="dot kanji"></span> Kanji
+      — đường giữa không gặp quái. WASD / mũi tên.
+    </p>
+    <div class="dpad" id="dpad">
+      <button type="button" data-dx="0" data-dy="-1">↑</button>
+      <div class="dpad-mid">
+        <button type="button" data-dx="-1" data-dy="0">←</button>
+        <button type="button" data-dx="1" data-dy="0">→</button>
+      </div>
+      <button type="button" data-dx="0" data-dy="1">↓</button>
+    </div>
+  </section>
 
-  <main>
+  <main id="screen-battle" hidden>
     <div class="board">
       <canvas id="battle" width="640" height="200"></canvas>
       <canvas id="pad" width="436" height="436"></canvas>
       <p id="hint" class="hint">Tô theo nét mờ. Sai 1 nét là vẽ lại cả chữ.</p>
     </div>
     <aside>
+      <div class="zone" id="zone">Hiragana</div>
       <div class="glyph" id="glyph">あ</div>
       <div class="romaji" id="romaji">a</div>
       <button type="button" id="btn-listen">Nghe</button>
@@ -40,12 +53,13 @@
         <span>Enemy HP</span>
         <strong id="enemy-hp">2 / 2</strong>
       </div>
-      <p id="status" class="status">Chọn hàng chữ để bắt đầu.</p>
+      <p id="status" class="status">Gặp quái!</p>
     </aside>
   </main>
 
   <footer>
-    Nét chữ từ <a href="http://kanjivg.tagaini.net">KanjiVG</a> (CC BY-SA 3.0). Không liên quan Mason Games / Wanna Kana.
+    Nét chữ từ <a href="http://kanjivg.tagaini.net">KanjiVG</a> (CC BY-SA 3.0).
+    Không liên quan Nintendo / Pokémon hay Mason Games.
   </footer>
 
   <svg id="probe" xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true">

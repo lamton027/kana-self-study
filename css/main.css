@@ -18,7 +18,7 @@ html, body {
   font: 16px/1.4 system-ui, sans-serif;
 }
 
-header, footer, nav, .rows, main {
+header, footer, #screen-world, main {
   max-width: 920px;
   margin: 0 auto;
   padding: 0 16px;
@@ -28,7 +28,51 @@ header { padding-top: 20px; }
 h1 { margin: 0; font-size: 1.4rem; }
 .sub { margin: 4px 0 16px; color: var(--muted); }
 
-.scripts, .rows { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+#world {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 640 / 288;
+  background: #1a2030;
+  border-radius: 12px;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.legend {
+  color: var(--muted);
+  font-size: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.dot.hira { background: #4a9e5c; }
+.dot.kata { background: #2f8fa3; }
+.dot.kanji { background: #7b4aa8; }
+
+.dpad {
+  width: 160px;
+  margin: 12px auto 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.dpad-mid { display: flex; gap: 36px; }
+
+.dpad button {
+  width: 44px;
+  height: 44px;
+  font-size: 1.1rem;
+}
 
 button {
   background: var(--panel);
@@ -39,11 +83,14 @@ button {
   cursor: pointer;
 }
 
-button.active, button:hover { border-color: var(--accent); color: var(--accent); }
+button:hover { border-color: var(--accent); color: var(--accent); }
 
-.rows button.cleared { color: var(--good); }
+#screen-world[hidden],
+#screen-battle[hidden] {
+  display: none !important;
+}
 
-main {
+#screen-battle {
   display: grid;
   grid-template-columns: minmax(280px, 1fr) 200px;
   gap: 16px;
@@ -82,8 +129,9 @@ aside {
   text-align: center;
 }
 
+.zone { color: var(--accent); font-size: 0.8rem; margin-bottom: 4px; }
 .glyph { font-size: 4rem; line-height: 1.1; }
-.romaji { font-size: 1.4rem; letter-spacing: 0.08em; margin-bottom: 8px; }
+.romaji { font-size: 1.2rem; letter-spacing: 0.06em; margin-bottom: 8px; }
 
 #btn-listen { width: 100%; margin-bottom: 12px; }
 
@@ -113,7 +161,7 @@ footer a { color: var(--accent); }
 #probe { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 @media (max-width: 700px) {
-  main { grid-template-columns: 1fr; }
+  #screen-battle { grid-template-columns: 1fr; }
   aside { order: -1; }
   .glyph { font-size: 2.6rem; }
 }

@@ -86,6 +86,39 @@ await mapPool(unique, 6, async (entry) => {
 });
 
 const byChar = Object.fromEntries(unique.map((c) => [c.char, c]));
+const KANJI = [
+  { char: "一", romaji: "ichi", meaning: "one" },
+  { char: "二", romaji: "ni", meaning: "two" },
+  { char: "三", romaji: "san", meaning: "three" },
+  { char: "人", romaji: "hito", meaning: "person" },
+  { char: "力", romaji: "chikara", meaning: "power" },
+  { char: "口", romaji: "kuchi", meaning: "mouth" },
+  { char: "山", romaji: "yama", meaning: "mountain" },
+  { char: "川", romaji: "kawa", meaning: "river" },
+  { char: "土", romaji: "tsuchi", meaning: "earth" },
+  { char: "大", romaji: "dai", meaning: "big" },
+  { char: "小", romaji: "shou", meaning: "small" },
+  { char: "中", romaji: "naka", meaning: "middle" },
+  { char: "日", romaji: "hi", meaning: "sun" },
+  { char: "月", romaji: "tsuki", meaning: "moon" },
+  { char: "木", romaji: "ki", meaning: "tree" },
+  { char: "田", romaji: "ta", meaning: "field" },
+  { char: "水", romaji: "mizu", meaning: "water" },
+  { char: "火", romaji: "hi", meaning: "fire" },
+  { char: "金", romaji: "kin", meaning: "gold" },
+  { char: "雨", romaji: "ame", meaning: "rain" },
+];
+
+const kanjiEntries = KANJI.map((k) => ({ ...k, script: "kanji", row: "kanji" }));
+console.log(`Fetching ${kanjiEntries.length} kanji...`);
+await mapPool(kanjiEntries, 6, async (entry) => {
+  entry.strokes = await fetchSvg(entry.char);
+  if (!entry.strokes.length)
+    throw new Error(`No strokes for ${entry.char}`);
+  console.log(`  ${entry.char} ${entry.strokes.length} strokes`);
+  return entry;
+});
+
 const data = {
   viewBox: 109,
   attribution: "Stroke paths from KanjiVG (http://kanjivg.tagaini.net), CC BY-SA 3.0",
@@ -96,6 +129,14 @@ const data = {
     script: c.script,
     row: c.row,
     strokes: byChar[c.char].strokes,
+  })),
+  kanji: kanjiEntries.map((k) => ({
+    char: k.char,
+    romaji: k.romaji,
+    meaning: k.meaning,
+    script: "kanji",
+    row: "kanji",
+    strokes: k.strokes,
   })),
 };
 

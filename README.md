@@ -1,13 +1,17 @@
-# Kana Trace
+# Ink Route
 
-Personal web practice for Hiragana and Katakana stroke order. Trace each character four times, then write the row from romaji (no ghost strokes).
+Personal web practice: walk a retro-style route, encounter creatures in grass, and attack by tracing Japanese characters.
+
+Progression by walking right:
+
+1. Green grass — Hiragana (あ行 → わ行)
+2. Teal grass — Katakana (ア行 → ワ行)
+3. Purple grass — simple Kanji (一 → 雨)
 
 Live: https://lamton027.github.io/kana-self-study/
-
-Open `index.html` locally (needs a static server because of ES modules), or use the GitHub Pages URL.
 
 ```
 npx --yes serve .
 ```
 
-Stroke paths from [KanjiVG](http://kanjivg.tagaini.net) (CC BY-SA 3.0). This is not affiliated with Mason Games or Wanna Kana.
+Stroke paths from [KanjiVG](http://kanjivg.tagaini.net) (CC BY-SA 3.0). Not affiliated with Nintendo, Pokémon, or Mason Games.
