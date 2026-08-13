@@ -313,8 +313,8 @@ function renderHud() {
   playerHpEl.textContent = `${Math.max(state.playerHp, 0)} / ${PLAYER_MAX}`;
   enemyHpEl.textContent = `${Math.max(state.enemyHp, 0)} / ${state.enemyMax}`;
   hintEl.textContent = state.mode === "boss"
-    ? "Boss: viết từ romaji. Đúng thì bạn đánh, sai thì boss đánh."
-    : "Tô đúng thì bạn tấn công. Tô sai thì enemy tấn công. 2 lần mỗi chữ.";
+    ? "Boss: viết từ romaji. Sai 1 nét là vẽ lại cả chữ."
+    : "Tô đúng thì bạn tấn công. Sai 1 nét là vẽ lại cả chữ từ đầu.";
 }
 
 function render() {
@@ -460,15 +460,18 @@ function finishStroke() {
     return;
   const result = matchStroke(state.ink, state.templates[state.stroke]);
   if (!result.ok) {
+    const refund = state.done.length;
     state.ink = [];
     drawPad();
     playAttack("enemy", () => {
+      state.enemyHp = Math.min(state.enemyMax, state.enemyHp + refund);
       state.playerHp -= 1;
+      resetWriting();
       if (state.playerHp <= 0) {
         retryKana();
         return;
       }
-      setStatus("Sai nét — enemy tấn công!", "bad");
+      setStatus("Sai nét — vẽ lại cả chữ từ đầu!", "bad");
       render();
     });
     return;
