@@ -53,6 +53,16 @@ main {
 
 .board { background: var(--panel); border-radius: 12px; padding: 12px; }
 
+#battle {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 640 / 200;
+  background: #0f1218;
+  border-radius: 8px;
+  display: block;
+  margin-bottom: 10px;
+}
+
 #pad {
   width: 100%;
   height: auto;
@@ -89,7 +99,8 @@ aside {
 .status.good { color: var(--good); }
 .status.bad { color: var(--bad); }
 
-#yokai { display: block; margin: 12px auto 0; }
+#player-hp { color: var(--accent); }
+#enemy-hp { color: var(--bad); }
 
 footer {
   color: var(--muted);
