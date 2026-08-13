@@ -31,8 +31,10 @@ h1 { margin: 0; font-size: 1.4rem; }
 #world {
   width: 100%;
   height: auto;
-  aspect-ratio: 640 / 288;
+  min-height: 360px;
+  aspect-ratio: 640 / 448;
   background: #1a2030;
+  border: 3px solid #4d8bff;
   border-radius: 12px;
   display: block;
   image-rendering: pixelated;

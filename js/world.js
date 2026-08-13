@@ -10,7 +10,9 @@ export const TILE = {
 
 const COLS = 40;
 const ROWS = 18;
-const SIZE = 16;
+const TILE_PX = 32;
+const VIEW_COLS = 20;
+const VIEW_ROWS = 14;
 const SPAWN = { x: 2, y: 9 };
 const ENCOUNTER_RATE = 0.16;
 const MOVE_MS = 110;
@@ -79,6 +81,8 @@ function pickGlyph(tile, x) {
 }
 
 export function initWorld({ canvas, onEncounter }) {
+  canvas.width = VIEW_COLS * TILE_PX;
+  canvas.height = VIEW_ROWS * TILE_PX;
   const ctx = canvas.getContext("2d");
   const grid = buildGrid();
   const player = { x: SPAWN.x, y: SPAWN.y, fx: SPAWN.x, fy: SPAWN.y, dir: 2 };
@@ -92,35 +96,70 @@ export function initWorld({ canvas, onEncounter }) {
     return grid[y][x];
   }
 
+  function camera() {
+    const cx = Math.max(0, Math.min(COLS - VIEW_COLS, player.fx - VIEW_COLS / 2 + 0.5));
+    const cy = Math.max(0, Math.min(ROWS - VIEW_ROWS, player.fy - VIEW_ROWS / 2 + 0.5));
+    return { cx, cy };
+  }
+
   function draw() {
+    const { cx, cy } = camera();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let y = 0; y < ROWS; y++) {
-      for (let x = 0; x < COLS; x++) {
-        const tile = grid[y][x];
-        ctx.fillStyle = COLORS[tile];
-        ctx.fillRect(x * SIZE, y * SIZE, SIZE, SIZE);
+    const x0 = Math.floor(cx);
+    const y0 = Math.floor(cy);
+    for (let y = y0; y <= y0 + VIEW_ROWS; y++) {
+      for (let x = x0; x <= x0 + VIEW_COLS; x++) {
+        const tile = tileAt(x, y);
+        const sx = (x - cx) * TILE_PX;
+        const sy = (y - cy) * TILE_PX;
+        ctx.fillStyle = COLORS[tile] || "#111";
+        ctx.fillRect(sx, sy, TILE_PX, TILE_PX);
         if (tile >= TILE.GRASS_HIRA) {
-          ctx.fillStyle = "rgba(0,0,0,0.18)";
-          ctx.fillRect(x * SIZE + 3, y * SIZE + 4, 3, 8);
-          ctx.fillRect(x * SIZE + 9, y * SIZE + 2, 3, 9);
+          ctx.fillStyle = "rgba(0,0,0,0.22)";
+          ctx.fillRect(sx + 8, sy + 6, 6, 18);
+          ctx.fillRect(sx + 18, sy + 4, 6, 20);
         }
       }
     }
-    const px = player.fx * SIZE + 2;
-    const py = player.fy * SIZE + 1;
+
+    ctx.font = "bold 14px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "rgba(255,255,255,0.85)";
+    const labels = [
+      { x: 12, y: 4.4, text: "HIRAGANA" },
+      { x: 23.5, y: 4.4, text: "KATAKANA" },
+      { x: 34, y: 4.4, text: "KANJI" },
+    ];
+    for (const label of labels) {
+      ctx.fillText(label.text, (label.x - cx) * TILE_PX, (label.y - cy) * TILE_PX);
+    }
+
+    const px = (player.fx - cx) * TILE_PX;
+    const py = (player.fy - cy) * TILE_PX;
+    ctx.fillStyle = "#1a1d24";
+    ctx.fillRect(px + 6, py + 22, 20, 6);
     ctx.fillStyle = "#3d6fd9";
-    ctx.fillRect(px, py, 12, 14);
+    ctx.fillRect(px + 6, py + 4, 20, 22);
     ctx.fillStyle = "#f0d5b0";
-    ctx.fillRect(px + 3, py + 1, 6, 5);
+    ctx.fillRect(px + 10, py + 6, 12, 10);
     ctx.fillStyle = "#dce7f7";
     if (player.dir === 1)
-      ctx.fillRect(px + 12, py + 6, 3, 2);
+      ctx.fillRect(px + 26, py + 14, 6, 4);
     else if (player.dir === 3)
-      ctx.fillRect(px - 3, py + 6, 3, 2);
+      ctx.fillRect(px, py + 14, 6, 4);
     else if (player.dir === 0)
-      ctx.fillRect(px + 5, py - 2, 2, 3);
+      ctx.fillRect(px + 14, py, 4, 6);
     else
-      ctx.fillRect(px + 5, py + 14, 2, 3);
+      ctx.fillRect(px + 14, py + 26, 4, 6);
+
+    ctx.fillStyle = "rgba(12,14,20,0.72)";
+    ctx.fillRect(0, 0, canvas.width, 28);
+    ctx.fillStyle = "#e8e4d9";
+    ctx.font = "13px sans-serif";
+    ctx.textAlign = "left";
+    const here = tileAt(player.x, player.y);
+    const zone = here === TILE.GRASS_KATA ? "Katakana" : here === TILE.GRASS_KANJI ? "Kanji" : here === TILE.GRASS_HIRA ? "Hiragana" : "Đường an toàn";
+    ctx.fillText(`MAP  ·  ${zone}  ·  đi vào cỏ để gặp quái`, 10, 19);
   }
 
   function tryMove(dx, dy) {
