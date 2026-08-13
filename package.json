@@ -1,0 +1,9 @@
+{
+  "name": "kana-self-study",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node js/stroke-matcher.check.js",
+    "build-data": "node tools/build-data.mjs"
+  }
+}

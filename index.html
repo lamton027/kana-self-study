@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Kana Trace</title>
+  <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+  <header>
+    <h1>Kana Trace</h1>
+    <p class="sub">Tự học Hiragana / Katakana — tô theo nét</p>
+  </header>
+
+  <nav class="scripts">
+    <button type="button" id="btn-hira" class="active" data-script="hiragana">Hiragana</button>
+    <button type="button" id="btn-kata" data-script="katakana">Katakana</button>
+  </nav>
+  <div id="rows" class="rows"></div>
+
+  <main>
+    <div class="board">
+      <canvas id="pad" width="436" height="436"></canvas>
+      <p id="hint" class="hint">Tô theo nét mờ, đúng thứ tự.</p>
+    </div>
+    <aside>
+      <div class="glyph" id="glyph">あ</div>
+      <div class="romaji" id="romaji">a</div>
+      <button type="button" id="btn-listen">Nghe</button>
+      <div class="stat">
+        <span>Nét</span>
+        <strong id="stroke-stat">1 / 3</strong>
+      </div>
+      <div class="stat">
+        <span id="hit-label">Hit (4 lần)</span>
+        <strong id="hit-stat">0 / 4</strong>
+      </div>
+      <canvas id="yokai" width="160" height="140"></canvas>
+      <p id="status" class="status">Chọn hàng chữ để bắt đầu.</p>
+    </aside>
+  </main>
+
+  <footer>
+    Nét chữ từ <a href="http://kanjivg.tagaini.net">KanjiVG</a> (CC BY-SA 3.0). Không liên quan Mason Games / Wanna Kana.
+  </footer>
+
+  <svg id="probe" xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true">
+    <path id="probe-path" d=""></path>
+  </svg>
+  <script type="module" src="./js/game.js"></script>
+</body>
+</html>

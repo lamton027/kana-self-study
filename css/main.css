@@ -1,0 +1,108 @@
+:root {
+  --bg: #14161c;
+  --panel: #1e222c;
+  --ink: #e8e4d9;
+  --muted: #8b91a1;
+  --accent: #7eb8ff;
+  --good: #6fdd8b;
+  --bad: #ff6f7d;
+  --line: #2c3344;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.4 system-ui, sans-serif;
+}
+
+header, footer, nav, .rows, main {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+header { padding-top: 20px; }
+h1 { margin: 0; font-size: 1.4rem; }
+.sub { margin: 4px 0 16px; color: var(--muted); }
+
+.scripts, .rows { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+
+button {
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+button.active, button:hover { border-color: var(--accent); color: var(--accent); }
+
+.rows button.cleared { color: var(--good); }
+
+main {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) 200px;
+  gap: 16px;
+  align-items: start;
+  padding-bottom: 24px;
+}
+
+.board { background: var(--panel); border-radius: 12px; padding: 12px; }
+
+#pad {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  background: #f4efe4;
+  border-radius: 8px;
+  touch-action: none;
+  display: block;
+}
+
+.hint { margin: 8px 0 0; color: var(--muted); font-size: 0.9rem; }
+
+aside {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.glyph { font-size: 4rem; line-height: 1.1; }
+.romaji { font-size: 1.4rem; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+#btn-listen { width: 100%; margin-bottom: 12px; }
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  margin: 6px 0;
+}
+
+.stat strong { color: var(--ink); }
+.status { min-height: 2.8em; color: var(--muted); font-size: 0.9rem; }
+.status.good { color: var(--good); }
+.status.bad { color: var(--bad); }
+
+#yokai { display: block; margin: 12px auto 0; }
+
+footer {
+  color: var(--muted);
+  font-size: 0.75rem;
+  padding-bottom: 24px;
+}
+
+footer a { color: var(--accent); }
+
+#probe { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+@media (max-width: 700px) {
+  main { grid-template-columns: 1fr; }
+  aside { order: -1; }
+  .glyph { font-size: 2.6rem; }
+}
